@@ -3,49 +3,224 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple URL Shortener</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Enhanced URL Shortener</title>
+    <link rel="stylesheet" href="styles-improved.css">
 </head>
 <body>
-    <main>
-        <h1>URL Shortener</h1>
-        <form id="shorten-form">
-            <input 
-                type="url" 
-                id="url-input" 
-                placeholder="Enter a long URL to shorten..." 
-                required 
-            />
-            <button type="submit">Shorten</button>
-        </form>
-        <div id="result-container">
-            <p>Your shortened URL:</p>
-            <a id="short-url" href="" target="_blank"></a>
+    <nav class="navbar">
+        <div class="nav-content">
+            <h1 class="logo">🔗 URL Shortener Pro</h1>
+            <div class="nav-tabs">
+                <button class="tab-btn active" data-tab="shorten">Shorten</button>
+                <button class="tab-btn" data-tab="list">My URLs</button>
+                <button class="tab-btn" data-tab="search">Search</button>
+            </div>
         </div>
-        <div id="error-container"></div>
+    </nav>
+
+    <main class="container">
+        <!-- Shorten Tab -->
+        <div id="shorten-tab" class="tab-content active">
+            <div class="card">
+                <h2>Create Short URL</h2>
+                <form id="shorten-form">
+                    <div class="form-group">
+                        <label for="url-input">Long URL *</label>
+                        <input 
+                            type="url" 
+                            id="url-input" 
+                            placeholder="https://example.com/very/long/url..." 
+                            required 
+                        />
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="custom-alias">Custom Alias (optional)</label>
+                            <input 
+                                type="text" 
+                                id="custom-alias" 
+                                placeholder="my-link"
+                                pattern="[a-zA-Z0-9_-]{3,20}"
+                                title="3-20 characters: letters, numbers, dash, underscore"
+                            />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="expires-in">Expires In (optional)</label>
+                            <select id="expires-in">
+                                <option value="">Never</option>
+                                <option value="3600">1 Hour</option>
+                                <option value="86400">1 Day</option>
+                                <option value="604800">1 Week</option>
+                                <option value="2592000">30 Days</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="title">Title (optional)</label>
+                            <input 
+                                type="text" 
+                                id="title" 
+                                placeholder="Link title"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description (optional)</label>
+                        <input 
+                            type="text" 
+                            id="description" 
+                            placeholder="Brief description of the link"
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password Protection (optional)</label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            placeholder="Set a password to protect this link"
+                        />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-text">Shorten URL</span>
+                        <span class="btn-loader" style="display: none;">⏳</span>
+                    </button>
+                </form>
+
+                <div id="result-container" style="display: none;">
+                    <div class="result-header">
+                        <h3>✅ URL Created Successfully!</h3>
+                    </div>
+                    <div class="result-content">
+                        <div class="short-url-display">
+                            <a id="short-url" href="" target="_blank"></a>
+                        </div>
+                        <div class="result-actions">
+                            <button id="copy-btn" class="btn btn-secondary">📋 Copy</button>
+                            <button id="qr-btn" class="btn btn-secondary">📱 QR Code</button>
+                            <button id="stats-btn" class="btn btn-secondary">📊 Stats</button>
+                        </div>
+                        <div id="qr-code" style="display: none; text-align: center; margin-top: 1rem;">
+                            <canvas id="qr-canvas"></canvas>
+                        </div>
+                        <div id="result-info"></div>
+                    </div>
+                </div>
+
+                <div id="error-container"></div>
+            </div>
+        </div>
+
+        <!-- List Tab -->
+        <div id="list-tab" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>My Shortened URLs</h2>
+                    <button id="refresh-list" class="btn btn-secondary">🔄 Refresh</button>
+                </div>
+                <div id="url-list">
+                    <div class="loading">Loading...</div>
+                </div>
+                <div id="pagination"></div>
+            </div>
+        </div>
+
+        <!-- Search Tab -->
+        <div id="search-tab" class="tab-content">
+            <div class="card">
+                <h2>Search URLs</h2>
+                <div class="search-container">
+                    <input 
+                        type="text" 
+                        id="search-input" 
+                        placeholder="Search by URL, title, or description..."
+                    />
+                    <button id="search-btn" class="btn btn-primary">🔍 Search</button>
+                </div>
+                <div id="search-results"></div>
+            </div>
+        </div>
+
+        <!-- Stats Modal -->
+        <div id="stats-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>📊 URL Statistics</h2>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div id="stats-content"></div>
+            </div>
+        </div>
     </main>
 
+    <footer>
+        <p>Enhanced URL Shortener with Analytics, Custom URLs, Expiration & More</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
-        // Simple front-end script
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.dataset.tab;
+                
+                // Update buttons
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Update content
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                document.getElementById(`${tab}-tab`).classList.add('active');
+                
+                // Load data if needed
+                if (tab === 'list') {
+                    loadUrlList();
+                }
+            });
+        });
+
+        // Shorten form
         document.getElementById('shorten-form').addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const longUrl = document.getElementById('url-input').value;
+            const customAlias = document.getElementById('custom-alias').value;
+            const expiresIn = document.getElementById('expires-in').value;
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const password = document.getElementById('password').value;
+
             const resultContainer = document.getElementById('result-container');
             const errorContainer = document.getElementById('error-container');
-            const shortUrlLink = document.getElementById('short-url');
+            const btnText = document.querySelector('.btn-text');
+            const btnLoader = document.querySelector('.btn-loader');
 
             // Reset UI
             resultContainer.style.display = 'none';
             errorContainer.textContent = '';
+            btnText.style.display = 'none';
+            btnLoader.style.display = 'inline';
 
             try {
+                const body = { longUrl };
+                if (customAlias) body.customAlias = customAlias;
+                if (expiresIn) body.expiresIn = parseInt(expiresIn);
+                if (title) body.title = title;
+                if (description) body.description = description;
+                if (password) body.password = password;
+
                 const response = await fetch('/shorten', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ longUrl: longUrl }),
+                    body: JSON.stringify(body),
                 });
 
                 if (!response.ok) {
@@ -55,15 +230,297 @@
 
                 const data = await response.json();
 
-                // Display the result
+                // Display result
+                const shortUrlLink = document.getElementById('short-url');
                 shortUrlLink.href = data.shortUrl;
                 shortUrlLink.textContent = data.shortUrl;
+                
+                // Store shortCode for later use
+                shortUrlLink.dataset.shortCode = data.shortCode;
+
+                // Show additional info
+                const resultInfo = document.getElementById('result-info');
+                let infoHtml = '';
+                if (data.existing) {
+                    infoHtml += '<p class="info-badge">ℹ️ This URL was already shortened</p>';
+                }
+                if (data.expiresAt) {
+                    infoHtml += `<p class="info-badge">⏰ Expires: ${new Date(data.expiresAt).toLocaleString()}</p>`;
+                }
+                if (data.protected) {
+                    infoHtml += '<p class="info-badge">🔒 Password protected</p>';
+                }
+                resultInfo.innerHTML = infoHtml;
+
                 resultContainer.style.display = 'block';
+                
+                // Clear form
+                e.target.reset();
 
             } catch (err) {
-                // Display the error
-                errorContainer.textContent = `Error: ${err.message}`;
+                errorContainer.textContent = `❌ Error: ${err.message}`;
+            } finally {
+                btnText.style.display = 'inline';
+                btnLoader.style.display = 'none';
             }
+        });
+
+        // Copy to clipboard
+        document.getElementById('copy-btn').addEventListener('click', async () => {
+            const shortUrl = document.getElementById('short-url').textContent;
+            try {
+                await navigator.clipboard.writeText(shortUrl);
+                const btn = document.getElementById('copy-btn');
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Copied!';
+                setTimeout(() => btn.textContent = originalText, 2000);
+            } catch (err) {
+                alert('Failed to copy to clipboard');
+            }
+        });
+
+        // Generate QR Code
+        document.getElementById('qr-btn').addEventListener('click', () => {
+            const qrContainer = document.getElementById('qr-code');
+            const shortUrl = document.getElementById('short-url').textContent;
+            
+            if (qrContainer.style.display === 'none') {
+                qrContainer.innerHTML = '<div id="qrcode"></div>';
+                new QRCode(document.getElementById('qrcode'), {
+                    text: shortUrl,
+                    width: 200,
+                    height: 200
+                });
+                qrContainer.style.display = 'block';
+            } else {
+                qrContainer.style.display = 'none';
+            }
+        });
+
+        // Show stats
+        document.getElementById('stats-btn').addEventListener('click', async () => {
+            const shortCode = document.getElementById('short-url').dataset.shortCode;
+            await showStats(shortCode);
+        });
+
+        // Load URL list
+        async function loadUrlList(page = 1) {
+            const listContainer = document.getElementById('url-list');
+            listContainer.innerHTML = '<div class="loading">Loading...</div>';
+
+            try {
+                const response = await fetch(`/list?page=${page}&limit=20`);
+                const data = await response.json();
+
+                if (data.urls.length === 0) {
+                    listContainer.innerHTML = '<p class="empty-state">No URLs found. Create your first short URL!</p>';
+                    return;
+                }
+
+                let html = '<div class="url-grid">';
+                data.urls.forEach(url => {
+                    html += `
+                        <div class="url-card">
+                            <div class="url-card-header">
+                                <h3>${url.title || 'Untitled'}</h3>
+                                <span class="click-count">👁️ ${url.clicks}</span>
+                            </div>
+                            <div class="url-card-body">
+                                <a href="${url.shortUrl}" target="_blank" class="short-url-link">${url.shortUrl}</a>
+                                <p class="long-url">${url.longUrl}</p>
+                                <div class="url-meta">
+                                    <span>📅 ${new Date(url.createdAt).toLocaleDateString()}</span>
+                                    ${url.expiresAt ? `<span>⏰ Expires: ${new Date(url.expiresAt).toLocaleDateString()}</span>` : ''}
+                                </div>
+                            </div>
+                            <div class="url-card-actions">
+                                <button class="btn-small" onclick="showStats('${url.shortUrl.split('/').pop()}')">📊 Stats</button>
+                                <button class="btn-small" onclick="copyUrl('${url.shortUrl}')">📋 Copy</button>
+                                <button class="btn-small btn-danger" onclick="deleteUrl('${url.shortUrl.split('/').pop()}')">🗑️ Delete</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+
+                // Add pagination
+                if (data.pagination.totalPages > 1) {
+                    html += '<div class="pagination">';
+                    for (let i = 1; i <= data.pagination.totalPages; i++) {
+                        html += `<button class="page-btn ${i === page ? 'active' : ''}" onclick="loadUrlList(${i})">${i}</button>`;
+                    }
+                    html += '</div>';
+                }
+
+                listContainer.innerHTML = html;
+
+            } catch (err) {
+                listContainer.innerHTML = `<p class="error">Error loading URLs: ${err.message}</p>`;
+            }
+        }
+
+        // Show stats modal
+        async function showStats(shortCode) {
+            const modal = document.getElementById('stats-modal');
+            const content = document.getElementById('stats-content');
+            
+            modal.style.display = 'flex';
+            content.innerHTML = '<div class="loading">Loading statistics...</div>';
+
+            try {
+                const response = await fetch(`/stats/${shortCode}`);
+                const data = await response.json();
+
+                let html = `
+                    <div class="stats-overview">
+                        <div class="stat-box">
+                            <div class="stat-value">${data.url.totalClicks}</div>
+                            <div class="stat-label">Total Clicks</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value">${data.recentClicks.length}</div>
+                            <div class="stat-label">Recent Activity</div>
+                        </div>
+                    </div>
+
+                    <div class="stats-section">
+                        <h3>URL Information</h3>
+                        <p><strong>Short URL:</strong> ${data.url.shortCode}</p>
+                        <p><strong>Long URL:</strong> <a href="${data.url.longUrl}" target="_blank">${data.url.longUrl}</a></p>
+                        <p><strong>Created:</strong> ${new Date(data.url.createdAt).toLocaleString()}</p>
+                        ${data.url.lastClickedAt ? `<p><strong>Last Clicked:</strong> ${new Date(data.url.lastClickedAt).toLocaleString()}</p>` : ''}
+                    </div>
+
+                    <div class="stats-section">
+                        <h3>Top Referrers</h3>
+                        <div class="referrer-list">
+                            ${data.topReferers.map(ref => `
+                                <div class="referrer-item">
+                                    <span>${ref.referer}</span>
+                                    <span class="count-badge">${ref.count}</span>
+                                </div>
+                            `).join('') || '<p>No referrer data yet</p>'}
+                        </div>
+                    </div>
+
+                    <div class="stats-section">
+                        <h3>Recent Clicks</h3>
+                        <div class="clicks-list">
+                            ${data.recentClicks.map(click => `
+                                <div class="click-item">
+                                    <span>${new Date(click.clickedAt).toLocaleString()}</span>
+                                    <span class="referer-badge">${click.referer}</span>
+                                </div>
+                            `).join('') || '<p>No clicks yet</p>'}
+                        </div>
+                    </div>
+                `;
+
+                content.innerHTML = html;
+
+            } catch (err) {
+                content.innerHTML = `<p class="error">Error loading statistics: ${err.message}</p>`;
+            }
+        }
+
+        // Close modal
+        document.querySelector('.modal-close').addEventListener('click', () => {
+            document.getElementById('stats-modal').style.display = 'none';
+        });
+
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('stats-modal');
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Copy URL helper
+        async function copyUrl(url) {
+            try {
+                await navigator.clipboard.writeText(url);
+                alert('✅ Copied to clipboard!');
+            } catch (err) {
+                alert('Failed to copy');
+            }
+        }
+
+        // Delete URL
+        async function deleteUrl(shortCode) {
+            if (!confirm('Are you sure you want to delete this URL?')) return;
+
+            try {
+                const response = await fetch(`/delete/${shortCode}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    alert('✅ URL deleted successfully');
+                    loadUrlList();
+                } else {
+                    throw new Error('Failed to delete');
+                }
+            } catch (err) {
+                alert('❌ Error: ' + err.message);
+            }
+        }
+
+        // Search functionality
+        document.getElementById('search-btn').addEventListener('click', async () => {
+            const query = document.getElementById('search-input').value.trim();
+            const resultsContainer = document.getElementById('search-results');
+
+            if (!query) {
+                resultsContainer.innerHTML = '<p class="info">Please enter a search query</p>';
+                return;
+            }
+
+            resultsContainer.innerHTML = '<div class="loading">Searching...</div>';
+
+            try {
+                const response = await fetch(`/search?q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+
+                if (data.results.length === 0) {
+                    resultsContainer.innerHTML = '<p class="empty-state">No results found</p>';
+                    return;
+                }
+
+                let html = '<div class="url-grid">';
+                data.results.forEach(url => {
+                    html += `
+                        <div class="url-card">
+                            <div class="url-card-header">
+                                <h3>${url.title || 'Untitled'}</h3>
+                                <span class="click-count">👁️ ${url.clicks}</span>
+                            </div>
+                            <div class="url-card-body">
+                                <a href="${url.shortUrl}" target="_blank" class="short-url-link">${url.shortUrl}</a>
+                                <p class="long-url">${url.longUrl}</p>
+                                ${url.description ? `<p class="description">${url.description}</p>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+
+                resultsContainer.innerHTML = html;
+
+            } catch (err) {
+                resultsContainer.innerHTML = `<p class="error">Error: ${err.message}</p>`;
+            }
+        });
+
+        // Search on Enter key
+        document.getElementById('search-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('search-btn').click();
+            }
+        });
+
+        // Refresh list button
+        document.getElementById('refresh-list').addEventListener('click', () => {
+            loadUrlList();
         });
     </script>
 </body>
